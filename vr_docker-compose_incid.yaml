@@ -1,0 +1,37 @@
+version: '3.8'
+
+# ---------------------------------------
+# Réseaux Docker
+# ---------------------------------------
+networks:
+  web:
+    external: true      # Réseau externe pour Traefik (exposition Internet)
+  internal:
+    external: false     # Réseau interne pour la communication entre conteneurs
+
+# ---------------------------------------
+# Services Docker
+# ---------------------------------------
+services:
+  incident:
+    image: incident_images:latest
+    container_name: incident_service
+    environment:
+      - DATABASE_URL=mysql://incident_user:ertete@mysql:3306/incident_datastore
+    volumes:
+      - /home/yvan/DockerRun/INCIDENT/.env:/App/Incident/.env
+      - /home/yvan/DockerRun/INCIDENT/uploads:/App/Incident/uploads
+      # - /home/yvan/DockerRun/INCIDENT/prisma:/App/Incident/prisma   # Décommenter si nécessaire
+    labels:
+      # Traefik : route le trafic HTTP(S) vers ce conteneur
+      - traefik.enable=true
+      - traefik.http.routers.incident.rule=Host(`incident.bfcgroupsa.com`)
+      - traefik.http.routers.incident.tls=true
+      - traefik.http.routers.incident.tls.certresolver=lets-encrypt
+      - traefik.http.services.incident.loadbalancer.server.port=4000
+    networks:
+      - internal
+      - web
+    depends_on:
+      - mysql
+      - memcached

@@ -1,0 +1,34 @@
+DATABASE_URL="mysql://incident_user:u56VT2fA@mysql:3306/incident_datastore?schema=public"
+USERS_API = "https://user.bfcgroupsa.com"
+ENTITY_API = "https://entity.bfcgroupsa.com/api"
+PORT=4000
+ADDRESS="https://incident.bfcgroupsa.com"
+NODE_ENV="production"
+
+EMAIL_HOST='smtp.office365.com'
+EMAIL_HOST_USER='no-reply@bfcgroupsa.com'
+EMAIL_HOST_PASSWORD='dpws@2025'
+EMAIL_PORT=587
+EMAIL_USE_TLS=true
+EMAIL_TIMEOUT=300
+
+VAPID_PRIVATE_KEY = 1urbvRcULh1pjhrRMTO0zb6hyDFfISwuU6hPHA8qqtM
+VAPID_PUBLIC_KEY = BC80LO1QR4OGnbbOOO9AqoklsCig2U09cl5-OKydkd3OSdQ_d3vDg6Ht1h0j50U8ylEAggS1CavesgfbASnrqHw
+
+https://budgetline.bfcgroupsa.com/api/major-budget-lines/analysis
+"https://budgetline.bfcgroupsa.com"
+
+DATABASE_URL="mysql://incident_user:u56VT2fA@mysql:3306/incident_datastore?schema=public"
+USERS_API = "https://user.bfcgroupsa.com"
+ENTITY_API = "https://entity.bfcgroupsa.com/api"
+PORT=4000
+ADDRESS="https://incident.bfcgroupsa.com"
+NODE_ENV="production"
+EMAIL_HOST='smtp.office365.com'
+EMAIL_HOST_USER='no-reply@bfcgroupsa.com'
+EMAIL_HOST_PASSWORD='dpws@2025'
+EMAIL_PORT=587
+EMAIL_USE_TLS=true
+EMAIL_TIMEOUT=300
+VAPID_PRIVATE_KEY = 82FiqqVWQhRDQaeLF6WZjPoHrStZuOiUsbUGmpCIicQ
+VAPID_PUBLIC_KEY = BAhTJaos2BAByf-7tYuNmi2JTla2bz6PrhfE89rWd9Cl-wdzyNTeYyKnlSw1wku-eT4D55w8iEl8koN8XhzXnEM

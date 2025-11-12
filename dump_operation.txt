@@ -1,0 +1,204 @@
+sudo su
+ls -la
+cd /home/yvan
+
+git stash
+git pull --rebase origin main
+git stash pop
+docker exec -i traefik-mysql-1 mysqldump -u incident_user -p incident_datastore > /home/yvan/backups/incident_datastore.sql
+
+docker exec -i traefik-mysql-1 mysqldump -u users -p users_datastore > /home/yvan/backups/users_datastore.sql
+
+docker exec -i traefik-mysql-1 mysqldump -u entity -p entity_datastore > /home/yvan/backups/entity_datastore.sql
+
+docker exec -i traefik-mysql-1 mysqldump -u incident_user -p incident_datastore > /home/yvan/backups/incident_datastore.sql
+
+### commande pour tirer le les donner sur le poste local:
+scp -r emmanuel@64.226.91.61:/home/emmanuel/backups C:\Users\eaoudou\Downloads\backups
+scp -r emmanuel@64.226.91.61:/home/emmanuel/Traefik C:\Users\eaoudou\Downloads\backups
+scp -r emmanuel@64.226.91.61:/home/emmanuel/migrations_from_backup C:\Users\eaoudou\Downloads\backups
+
+commande pour copier d'un repertoire à un autre sur unbuntuServeur:
+sudo cp -r /home/yvan/backups /home/emmanuel/backups
+sudo cp -r /home/yvan/migrations_from_backup /home/emmanuel/migrations_from_backup
+sudo cp -r /home/yvan/Traefik /home/emmanuel/Traefik
+### reconstruction de l'image pour user
+docker build -t users_images:latest  .
+### reconstruire sans le cache (tous à zéro):
+docker build --no-cache -t users_images:latest .
+### arrêter et relancer les conteneur existant avec le nom du conteneur:
+docker ps      # pour voir les conteneurs en cours
+docker stop traefik-users-1
+docker rm traefik-users-1
+docker ps
+docker logs traefik-users-1
+comme user n'a pas docker_compose on fera:
+docker run -d \
+  --name traefik-users-1 \
+  -p 8082:80 \
+  users_images:latest
+docker run -d -p 8082:80 --name traefik-users-1 users_images:latest
+docker logs traefik-users-1
+
+tous ce code revien à 👍docker-compose up --build -d
+api_gateway_settings/wsgi.py
+docker ps -a | grep traefik-users-1
+
+docker stop traefik-users-1
+docker rm traefik-users-1
+docker-compose -f docker-compose.yml up -d
+docker-compose -f docker-compose.yml ps
+
+entity:
+name: traefik-entity-1
+image: entity_image:latest
+docker stop traefik-entity-1
+docker rm traefik-entity-1
+docker-compose -f docker-compose.yml up -d
+docker-compose -f docker-compose.yml ps
+
+copie et sauvegarde des images docker:
+docker save -o /home/yvan/backups/incident_images_backup.tar incident_images:latest
+docker save -o /home/yvan/backups/berp_image_backup.tar berp_image:latest
+docker save -o /home/yvan/backups/users_images_backup.tar users_images:latest
+docker save -o /home/yvan/backups/entity_image_backup.tar entity_image:latest
+ls -lh /home/yvan/backups/
+
+pour reimporter l'image on utilise:
+docker load -i /home/yvan/backups/incident_images_backup.tar
+si l'image sauvegardé s'appelait: incident_images   latest   18c73ccdd00f
+Alors après docker load, on le reverras avec : docker images
+
+Résultat attendu :
+REPOSITORY        TAG       IMAGE ID       CREATED        SIZE
+incident_images   latest    18c73ccdd00f   2 weeks ago    350MB
+
+commande de migration
+# 1. Se connecter au conteneur
+docker exec -it traefik-entity-1 /bin/bash
+
+# 2. Dans le conteneur, exécuter les migrations
+npx prisma migrate deploy
+# Vérifiez que les migrations sont appliquées
+npx prisma migrate status
+
+# 3. Ou en une seule commande
+docker exec traefik-entity-1 npx prisma migrate deploy
+
+Incident:
+name: incident
+image: incident_images:latest
+docker stop incident
+docker rm incident
+
+# Build et lancement
+docker-compose -f docker-compose.yaml build --no-cache
+docker-compose -f docker-compose.yaml up -d
+docker-compose -f docker-compose.yaml ps
+
+# Vérification
+docker ps | grep incident
+docker logs incident
+
+# Exécuter les migrations sur le conteneur existant
+docker exec incident npx prisma migrate deploy
+
+# Vérifier le statut
+docker exec incident npx prisma migrate status
+
+# Test
+curl https://entity.bfcgroupsa.com
+
+BERP:
+name: berp
+image: berp_image:latest 
+docker stop berp
+docker rm berp
+
+# Build et lancement
+docker-compose -f docker-compose.yml build --no-cache
+docker-compose -f docker-compose.yml up -d
+docker-compose -f docker-compose.yml ps
+
+
+réccupérer les migration d'un conteneur:
+docker cp temp_container:/app/migrations ./migrations_backup/
+
+# 1. Récupérer les migrations
+docker create --name temp_backup incident_images:backup-20250912-1100
+docker cp temp_backup:/app/prisma/migrations ./migrations_from_backup/
+docker cp temp_explorer:/App/Incident/prisma/migrations ./migrations_from_backup/
+docker rm temp_backup
+
+# 2. Vérifier le contenu
+ls -la ./migrations_from_backup/
+
+# 3. Les intégrer à votre projet actuel
+# Soit en les copiant directement dans votre code source
+# Soit en les ajoutant à votre build Docker
+
+docker run -d \
+  --name incident \
+  --restart unless-stopped \
+  --network traefik_internal \
+  --network web \
+  -e DATABASE_URL="mysql://incident_user:u56VT2fA@mysql:3306/incident_datastore?schema=public" \
+  -e USERS_API="https://user.bfcgroupsa.com" \
+  -e ENTITY_API="https://entity.bfcgroupsa.com/api" \
+  -e PORT="4000" \
+  -e ADDRESS="https://incident.bfcgroupsa.com" \
+  -e NODE_ENV="production" \
+  -e EMAIL_HOST="smtp.office365.com" \
+  -e EMAIL_HOST_USER="no-reply@bfcgroupsa.com" \
+  -e EMAIL_HOST_PASSWORD="dpws@2025" \
+  -e EMAIL_PORT="587" \
+  -e EMAIL_USE_TLS="true" \
+  -e EMAIL_TIMEOUT="300" \
+  -e VAPID_PRIVATE_KEY="1urbvRcULh1pjhrRMTO0zb6hyDFfISwuU6hPHA8qqtM" \
+  -e VAPID_PUBLIC_KEY="BC80LO1QR4OGnbbOOO9AqoklsCig2U09cl5-OKydkd3OSdQ_d3vDg6Ht1h0j50U8ylEAggS1CavesgfbASnrqHw" \
+  -e USER_GATEWAY_API_URL="https://user.bfcgroupsa.com" \
+  -e INCIDENT_API_URL="https://incident.bfcgroupsa.com/api" \
+  -e USE_FULL_URL="true" \
+  -l 'traefik.http.routers.incident.rule=Host(`incident.bfcgroupsa.com`)' \
+  -l 'traefik.http.routers.incident.tls=true' \
+  -l 'traefik.http.routers.incident.tls.certresolver=lets-encrypt' \
+  -l 'traefik.http.services.incident.loadbalancer.server.port=4000' \
+  incident_images:latest
+
+  root@ubuntu-bfc-prod:/home/yvan/Incident-Manager# cat .env
+DATABASE_URL=mysql://incident_user:u56VT2fA@mysql:3306/incident_datastore?schema=public
+USERS_API=https://user.bfcgroupsa.com
+ENTITY_API=https://entity.bfcgroupsa.com/api
+PORT=4000
+ADDRESS=https://incident.bfcgroupsa.com
+NODE_ENV=production
+EMAIL_HOST=smtp.office365.com
+EMAIL_HOST_USER=no-reply@bfcgroupsa.com
+EMAIL_HOST_PASSWORD=dpws@2025
+EMAIL_PORT=587
+EMAIL_USE_TLS=true
+EMAIL_TIMEOUT=300
+VAPID_PRIVATE_KEY=1urbvRcULh1pjhrRMTO0zb6hyDFfISwuU6hPHA8qqtM
+VAPID_PUBLIC_KEY=BC80LO1QR4OGnbbOOO9AqoklsCig2U09cl5-OKydkd3OSdQ_d3vDg6Ht1h0j50U8ylEAggS1CavesgfbASnrqHw
+USER_GATEWAY_API_URL=https://user.bfcgroupsa.com
+INCIDENT_API_URL=https://incident.bfcgroupsa.com/api
+USE_FULL_URL=true  # ou false selon l'environnement
+root@ubuntu-bfc-prod:/home/yvan/Incident-Manager#
+
+cp storage\logs\laravel.log storage\logs\laravel_$(date+"%Y-%m-%d_%H-%M-%S").log
+Rename-Item "C:\inetpub\wwwroot\bfc_daf_support\storage\logs\laravel.log" "laravel_$(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss').log"
+New-Item "C:\inetpub\wwwroot\bfc_daf_support\storage\logs\laravel.log" -ItemType File -Force
+
+Création d'un nouveau conteneur mysql:
+docker run -d \
+  --name mysql-incident-fresh \
+  --network="traefik_internal" \
+  -e MYSQL_ROOT_PASSWORD=Root_Pass_2025 \
+  -e MYSQL_DATABASE=incident_datastore \
+  -e MYSQL_USER=incident_user \
+  -e MYSQL_PASSWORD=u56VT2fA \
+  -p 3307:3306 \
+  mysql:8.0 \
+  --default-authentication-plugin=mysql_native_password
+
+  pour se connecter au conteneur: docker exec -it mysql-incident-fresh mysql -u root -p (passe : Root_Pass_2025)

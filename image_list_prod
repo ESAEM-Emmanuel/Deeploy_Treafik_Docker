@@ -1,0 +1,32 @@
+root@ubuntu-bfc-prod:/home/yvan/entity-berp# docker images
+REPOSITORY         TAG                    IMAGE ID       CREATED        SIZE
+users_images       latest                 62f5ee66dbc8   22 hours ago   930MB
+<none>             <none>                 94b241984705   23 hours ago   930MB
+incident_images    latest                 e8f422d6d987   2 weeks ago    1.47GB
+<none>             <none>                 16a67e6abc9a   2 weeks ago    1.47GB
+curlimages/curl    latest                 51674a38c330   2 weeks ago    29.9MB
+bblm_image         latest                 5e10a997d6cb   3 weeks ago    1.43GB
+certbot/certbot    latest                 88af25f59948   4 weeks ago    183MB
+nginx              mainline-alpine        4a86014ec699   7 weeks ago    52.5MB
+berp_image         latest                 933829c8d91b   2 months ago   1.1GB
+mediasoup_image    latest                 b10a4f8092e7   3 months ago   330MB
+<none>             <none>                 ce1ddf899f4d   3 months ago   330MB
+bblm_image         backup-20250910-1526   4b5e55cbcdc3   3 months ago   1.43GB
+<none>             <none>                 445327d8a47f   3 months ago   330MB
+users_images       backup-20250912-1001   46efb2b00d04   3 months ago   930MB
+<none>             <none>                 712aae86d7e2   3 months ago   1.1GB
+incident_images    backup-20250912-1100   ec56a5f53259   3 months ago   1.47GB
+suas_media_image   latest                 8bf905a0efbb   3 months ago   396MB
+suas_image         latest                 ba3c6651346a   3 months ago   54.7MB
+suas_api_image     latest                 24b91a1cd2fd   3 months ago   1.3GB
+wpo_image          latest                 5dd21de51ed8   4 months ago   1.64GB
+entity_image       latest                 e15e9fa2fc01   4 months ago   1.64GB
+porthub_image      latest                 c93704ba304a   4 months ago   1.11GB
+postgis/postgis    latest                 8ac28d54be85   7 months ago   691MB
+dpage/pgadmin4     9.0                    bba87308768e   7 months ago   512MB
+nginx              latest                 97662d24417b   7 months ago   192MB
+memcached          latest                 25b59c15aa68   7 months ago   84.8MB
+mysql              8.0                    6616596982ed   8 months ago   764MB
+traefik            v2.5                   865923368a9f   3 years ago    101MB
+adminer            4.6.3-standalone       d136953c457f   6 years ago    82.1MB
+root@ubuntu-bfc-prod:/home/yvan/entity-berp#

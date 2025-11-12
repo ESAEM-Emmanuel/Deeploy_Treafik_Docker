@@ -1,0 +1,18 @@
+DATABASE_URL="mysql://budget:2u8eSD7j@mysql:3306/bfc_budget_line?schema=public"
+PORT = 3000
+USERS_API= "https://user.bfcgroupsa.com/gateway/"
+ENTITY_API= "https:/entity.bfcgroupsa.com/api/"
+SENTRY_DSN= "https://36803a5f6c7ad9868e4f3cc48a2b5850@o4508484136599552.ingest.de.sentry.io/4509004225970256"
+
+
+#ADDRESS = "budgetline.bfcgroupsa.com"
+ADDRESS = "0.0.0.0"
+DEBUG = true
+
+ALLOWED_ORIGIN=*
+ALLOWED_METHODS=*
+ALLOWED_HEADERS=Content-Type,Authorization,X-Requested-With,Accept
+
+RATE_LIMIT = 20
+RATE_INTERVAL = 60 * 1000
+REQUEST_TIMEOUT = 15000
